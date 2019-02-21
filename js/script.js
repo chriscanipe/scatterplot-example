@@ -1,5 +1,6 @@
 //Global functions are declared outside of functions.
 //Global means we can access them from anywhere in our script.
+//These are all variables we have named ourselves
 let margin;
 let width;
 let height;
@@ -10,6 +11,7 @@ let plot;
 let xAxis;
 let yAxis;
 let theData;
+let dot;
 
 function init() {
 
@@ -19,7 +21,6 @@ function init() {
 
         //This is the callback.
         //It's the stuff that happens once the data has been called.
-
         theData = data;
 
         //Append our elements to the page. This only happens on load.
@@ -27,7 +28,7 @@ function init() {
         
         //Update positions and styles for everything on the page
         //whenever we update the page (on re-size, for example).
-        update()
+        update();
 
     })
 
@@ -43,11 +44,19 @@ function update() {
 
 function setDimensions() {
 
+    //there are two main types of data elements in JavaScript:
+    //1. Object {}
+      //Objects are accessible by keys, example: margin.top where ".top" is the key value.
+    //2. Array []
+      //Arrays are lists ex: [1,2,3,4,5];
+      //Arrays can contain objects [{foo: bar, color: "green"}, {hat: brown, "dog" : "fido"}]
+
+    //This is an object
     margin = {
         top: 30,
         right: 30,
-        bottom: 50,
-        left: 40,
+        bottom: 40,
+        left: 40
     };
 
     width = 700 - margin.left - margin.right;
@@ -56,6 +65,8 @@ function setDimensions() {
 
 
 function setScales() {
+
+    //These d3.scaleLinear() elements are functions that exist in D3
 
     xScale = d3.scaleLinear() //This is a linear scale
         .rangeRound([0, width]) //Its "range" is the width of `this.plot`
@@ -76,12 +87,16 @@ function appendElements() {
     plot = svg.append("g").attr("class", "chart-g");
 
     //The xAxis and yAxis group tags will hold our xAxis elements (ticks, etc.)
-    xAxis = plot.append("g").classed("axis x-axis", true);
-    yAxis = plot.append("g").classed("axis y-axis", true);
+    xAxis = plot.append("g")
+      .classed("axis x-axis", true);
+
+    yAxis = plot.append("g")
+      .classed("axis y-axis", true);
+
+
+    dot = plot.append("circle");
 
 }
-
-
 
 function updateElements() {
 
@@ -110,6 +125,13 @@ function updateElements() {
             d3.axisLeft(yScale)
             .tickSize(-width - 20)
         );
+
+    dot.attr("r", 5)
+      .attr("cx", xScale(50))
+      .attr("cy", yScale(50))
+
+
+
 
 }
 
