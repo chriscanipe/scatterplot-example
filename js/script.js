@@ -13,11 +13,14 @@ let yAxis;
 let theData;
 let dot;
 
+
 function init() {
 
     //Here's where we call our data. Once we have it, we can do stuff with it in the "callback"
     d3.csv("data/data.csv", function(error, data) {
         if (error) throw error;
+
+        console.log(data);
 
         //This is the callback.
         //It's the stuff that happens once the data has been called.
@@ -25,7 +28,7 @@ function init() {
 
         //Append our elements to the page. This only happens on load.
         appendElements();
-        
+
         //Update positions and styles for everything on the page
         //whenever we update the page (on re-size, for example).
         update();
@@ -46,17 +49,17 @@ function setDimensions() {
 
     //there are two main types of data elements in JavaScript:
     //1. Object {}
-      //Objects are accessible by keys, example: margin.top where ".top" is the key value.
+    //Objects are accessible by keys, example: margin.top where ".top" is the key value.
     //2. Array []
-      //Arrays are lists ex: [1,2,3,4,5];
-      //Arrays can contain objects [{foo: bar, color: "green"}, {hat: brown, "dog" : "fido"}]
+    //Arrays are lists ex: [1,2,3,4,5];
+    //Arrays can contain objects [{foo: bar, color: "green"}, {hat: brown, "dog" : "fido"}]
 
     //This is an object
     margin = {
         top: 30,
         right: 30,
         bottom: 40,
-        left: 40
+        left: 100
     };
 
     width = 700 - margin.left - margin.right;
@@ -70,13 +73,25 @@ function setScales() {
 
     xScale = d3.scaleLinear() //This is a linear scale
         .rangeRound([0, width]) //Its "range" is the width of `this.plot`
-        .domain([0, 100]); //Its "domain" defaults to 0 to 100.
+        .domain([0, 2000000]); //Its "domain" defaults to 0 to 100.
+
+    // xScale = d3.scaleLog()
+    //     .domain([1, 42100000])
+    //     .range([0, width]);
 
     yScale = d3.scaleLinear()
         .rangeRound([height, 0])
-        .domain([0, 100]);
+        .domain([0, 2000000]);
+
+    // yScale = d3.scaleLog()
+    //     .domain([1, 42100000])
+    //     .range([height, 0])
+
 
 }
+
+
+
 
 function appendElements() {
 
@@ -88,15 +103,23 @@ function appendElements() {
 
     //The xAxis and yAxis group tags will hold our xAxis elements (ticks, etc.)
     xAxis = plot.append("g")
-      .classed("axis x-axis", true);
+        .classed("axis x-axis", true);
 
     yAxis = plot.append("g")
-      .classed("axis y-axis", true);
+        .classed("axis y-axis", true);
+
+    dot = plot.selectAll(".dot")
+        .data(theData)
+        .enter().append("circle");
 
 
-    dot = plot.append("circle");
+    // for each thing do this thing.
+
 
 }
+
+
+
 
 function updateElements() {
 
@@ -107,7 +130,7 @@ function updateElements() {
     //this.plot is offset from the top and left of the this.svg
     plot.attr("transform", `translate(${margin.left},${margin.top})`);
 
-    console.log(width, height);
+
 
     //This is where the axis elements get drawn. The "transform" property positions them
     //And the the .call() method draws the axis within that tag.
@@ -116,7 +139,7 @@ function updateElements() {
         .attr("transform", "translate(0," + (height + 20) + ")")
         .call(
             d3.axisBottom(xScale)
-              .tickSize(-height - 20)
+            .tickSize(-height - 20)
         );
 
     yAxis
@@ -126,9 +149,30 @@ function updateElements() {
             .tickSize(-width - 20)
         );
 
+    let colors = {
+      "nhl" : "blue",
+      "nfl" : "brown",
+      "nba" : "red",
+      "mlb" : "green"
+    }
+
+    
+
     dot.attr("r", 5)
-      .attr("cx", xScale(50))
-      .attr("cy", yScale(50))
+        .attr("cx", d => {
+            let twitter = +d.twitter;
+            return xScale(twitter);
+        })
+        .attr("cy", d => {
+            let insta = +d.instagram;
+            return yScale(insta);
+        })
+        .attr("fill", d=> {
+          return colors[d.sport];
+        })
+
+
+
 
 
 
